@@ -153,7 +153,7 @@ impl MediaControls {
 
         self.thread = Some(ServiceThreadHandle {
             event_channel,
-            thread: thread::spawn(move || run_service(conn, friendly_name, event_handler, rx)),
+            thread: thread::spawn(move || run_service(conn, dbus_name, friendly_name, event_handler, rx)),
         });
         Ok(())
     }
@@ -201,6 +201,7 @@ impl MediaControls {
 
 fn run_service<F>(
     conn: Connection,
+    dbus_name: String,
     friendly_name: String,
     event_handler: F,
     event_channel: mpsc::Receiver<InternalEvent>,
@@ -218,7 +219,7 @@ where
     let seeked_signal = Arc::new(Mutex::new(None));
 
     let mut cr =
-        super::interfaces::register_methods(&state, &event_handler, friendly_name, seeked_signal);
+        super::interfaces::register_methods(&state, &event_handler, dbus_name, friendly_name, seeked_signal);
 
     conn.start_receive(
         dbus::message::MatchRule::new_method_call(),

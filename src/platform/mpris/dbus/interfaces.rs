@@ -19,6 +19,7 @@ pub type SeekedSignal =
 pub fn register_methods<F>(
     state: &Arc<Mutex<ServiceState>>,
     event_handler: &Arc<Mutex<F>>,
+    dbus_name: String,
     friendly_name: String,
     seeked_signal: SeekedSignal,
 ) -> Crossroads
@@ -51,6 +52,9 @@ where
                 .emits_changed_true();
             b.property("SupportedMimeTypes")
                 .get(move |_, _| Ok(&[] as &[String]))
+                .emits_changed_true();
+            b.property("DesktopEntry")
+                .get(move |_, _| Ok(dbus_name.clone()))
                 .emits_changed_true();
         }
     });

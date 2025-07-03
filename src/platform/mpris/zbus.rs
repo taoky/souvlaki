@@ -143,6 +143,7 @@ impl MediaControls {
 
 struct AppInterface {
     friendly_name: String,
+    dbus_name: String,
     event_handler: Arc<Mutex<dyn Fn(MediaControlEvent) + Send + 'static>>,
 }
 
@@ -183,6 +184,11 @@ impl AppInterface {
     #[dbus_interface(property)]
     fn supported_mime_types(&self) -> &[&str] {
         &[]
+    }
+
+    #[dbus_interface(property)]
+    fn desktop_entry(&self) -> &str {
+        &self.dbus_name
     }
 }
 
@@ -388,6 +394,7 @@ async fn run_service(
 ) -> zbus::Result<()> {
     let app = AppInterface {
         friendly_name,
+        dbus_name: dbus_name.clone(),
         event_handler: event_handler.clone(),
     };
 
